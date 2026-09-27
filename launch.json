@@ -1,0 +1,26 @@
+{
+  "kind": "univ4_hook",
+  "hook": {
+    "contract": "BuyOnlyWindowHook",
+    "constructorArgs": [
+      "0xE03A1074c86CFeDd5C142C4F04F1a1536e203543"
+    ],
+    "permissions": [
+      "afterInitialize",
+      "beforeSwap"
+    ]
+  },
+  "token": {
+    "contract": "OWLN",
+    "name": "Oneway Launch",
+    "symbol": "OWLN",
+    "decimals": 18
+  },
+  "pool": {
+    "pairedCurrency": "0x0000000000000000000000000000000000000000",
+    "fee": 3000,
+    "tickSpacing": 60,
+    "initialPrice": "79228162514264337593543950336000"
+  },
+  "notes": "Describes src/BuyOnlyWindowHook.sol and src/OWLN.sol for the approved Sepolia launch. The hook's sole constructor argument is the approved Sepolia PoolManager; OWLN has a zero-argument constructor. The pool sorts native ETH as currency0 and OWLN as currency1. initialPrice is decimal sqrtPriceX96, equal to 1000 * 2^96, giving 1,000,000 OWLN per ETH with 18 decimals on both sides. This adopts the price in test/helpers/LaunchParameters.sol used by the local one-sided OWLN seed and first-buy rehearsal; the approved workflow supplies no numeric price. Only afterInitialize and beforeSwap are enabled; all other permissions are false. The constructor validates permissions, requiring a mined hook address with low 14 bits 0x1080. Both callbacks require the immutable PoolManager. Native-ETH initialization records opensAt[poolId] = block.number + 300 and emits WindowSet. Before that block, token-to-ETH swaps revert with SellsLocked(opensAt) for both exact input and exact output; buys are allowed. Sells pass at exactly opensAt. Allowed swaps return zero delta and zero fee override: the hook charges nothing, while the pool's 0.3% LP fee applies. There are no liquidity or donation callbacks, so liquidity can be added or removed during the window. Each native-ETH pool has its own window; non-native-ETH pools have no window or gating. opensAt and sellsOpen expose the block-based state; sellsOpen is also true for unknown pools and does not prove liquidity or pool existence. The hook has no admin, setter, pause, upgrade or sweep. Blocking sells is the mechanism honeypots use; this is a disclosed, fixed 300-block test, visible on-chain before buying. Local rehearsal evidence does not establish live factory execution or independent review. This manifest is a technical description; deployment policy and signed artifact linkage are supplied separately by services."
+}
